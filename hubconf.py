@@ -11,6 +11,7 @@ from utils_vad import (init_jit_model,
                        read_audio,
                        VADIterator,
                        collect_chunks,
+                       collect_chunks_with_crossfade,
                        drop_chunks,
                        Validator,
                        OnnxWrapper)
@@ -48,7 +49,8 @@ def silero_vad(onnx=False, force_onnx_cpu=False):
              save_audio,
              read_audio,
              VADIterator,
-             collect_chunks)
+             collect_chunks,
+             collect_chunks_with_crossfade)
 
     return model, utils
 
