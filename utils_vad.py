@@ -522,6 +522,31 @@ def collect_chunks(tss: List[dict],
         chunks.append(wav[i['start']: i['end']])
     return torch.cat(chunks)
 
+def collect_chunks_with_crossfade(tss: List[dict],
+                   wav: torch.Tensor):
+    
+    fade_len = 100
+    fade_in = np.hanning(fade_len*2)[0:fade_len]
+    fade_out = np.hanning(fade_len*2)[-fade_len:]
+
+    chunks = []
+    for i in tss:
+        chunk = wav[i['start']: i['end']]
+        chunk[:fade_len] *= fade_in
+        chunk[-fade_len:] *= fade_out
+
+        if i > 0:
+            prev_chunk = wav[i['start']: i['end']]
+            prev_chunk[-fade_len:] *= fade_out
+            chunk[:fade_len] += prev_chunk[-fade_len:]
+
+        if i < len(tss):
+            next_chunk = wav[i['start']: i['end']]
+            next_chunk[:fade_len] *= fade_in
+            chunk[-fade_len:] += next_chunk[:fade_len]
+
+        chunks.append(chunk)
+    return torch.cat(chunks)
 
 def drop_chunks(tss: List[dict],
                 wav: torch.Tensor):
