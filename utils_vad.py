@@ -526,8 +526,8 @@ def collect_chunks_with_crossfade(tss: List[dict],
                    wav: torch.Tensor):
     
     fade_len = 100
-    fade_in = np.hanning(fade_len*2)[0:fade_len]
-    fade_out = np.hanning(fade_len*2)[-fade_len:]
+    fade_in = torch.hann_window(fade_len*2)[0:fade_len]
+    fade_out = torch.hann_window(fade_len*2)[-fade_len:]
 
     chunks = []
     for i in tss:
