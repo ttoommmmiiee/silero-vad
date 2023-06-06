@@ -51,7 +51,6 @@ def silero_vad(onnx=False, force_onnx_cpu=False):
              read_audio,
              VADIterator,
              collect_chunks,
-             drop_chunks,
              collect_chunks_with_crossfade)
 
     return model, utils
