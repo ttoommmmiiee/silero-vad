@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import torchaudio
 from typing import Callable, List
 import torch.nn.functional as F
@@ -522,26 +523,28 @@ def collect_chunks(tss: List[dict],
         chunks.append(wav[i['start']: i['end']])
     return torch.cat(chunks)
 
-def collect_chunks_with_crossfade(tss: List[dict],
-                   wav: torch.Tensor):
+def _collect_chunks_with_crossfade(tss: List[dict],
+                                   wav: torch.Tensor,
+                                   fade_len = 100
+                                   ):
     
-    fade_len = 100
-    fade_in = torch.hann_window(fade_len*2)[0:fade_len]
-    fade_out = torch.hann_window(fade_len*2)[-fade_len:]
+    fade_len = fade_len
+    fade_in = np.hanning(fade_len*2)[0:fade_len]
+    fade_out = np.hanning(fade_len*2)[-fade_len:]
 
     chunks = []
-    for i in tss:
-        chunk = wav[i['start']: i['end']]
+    for i, ts in enumerate(tss):
+        chunk = wav[ts['start']: ts['end']]
         chunk[:fade_len] *= fade_in
         chunk[-fade_len:] *= fade_out
 
         if i > 0:
-            prev_chunk = wav[i['start']: i['end']]
+            prev_chunk = wav[tss[i-1]['start']: tss[i-1]['end']]
             prev_chunk[-fade_len:] *= fade_out
             chunk[:fade_len] += prev_chunk[-fade_len:]
 
-        if i < len(tss):
-            next_chunk = wav[i['start']: i['end']]
+        if i < len(tss)-1:
+            next_chunk = wav[tss[i+1]['start']: tss[i+1]['end']+1]
             next_chunk[:fade_len] *= fade_in
             chunk[-fade_len:] += next_chunk[:fade_len]
 
