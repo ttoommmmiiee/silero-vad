@@ -2,7 +2,7 @@ dependencies = ['torch', 'torchaudio']
 import torch
 import json
 import os
-from .utils_vad import (init_jit_model,
+from utils_vad import (init_jit_model,
                        get_speech_timestamps,
                        get_number_ts,
                        get_language,
@@ -51,6 +51,7 @@ def silero_vad(onnx=False, force_onnx_cpu=False):
              read_audio,
              VADIterator,
              collect_chunks,
+             drop_chunks,
              collect_chunks_with_crossfade)
 
     return model, utils
